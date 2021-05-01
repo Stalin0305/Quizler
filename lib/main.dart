@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'quizBrain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+
+QuizBrain quizBrain = QuizBrain();
 
 void main() {
   runApp(QuizllerApp());
@@ -27,16 +31,55 @@ class QuizBox extends StatefulWidget {
 }
 
 class _QuizBoxState extends State<QuizBox> {
-  List<Icon> scoreKeeper = [
-    Icon(
-      Icons.check,
-      color: Colors.green,
-    ),
-    Icon(
-      Icons.close,
-      color: Colors.red,
-    ),
-  ];
+  // List<String> questions = [
+  //   'You can lead a cow downstairs, but not upstairs',
+  //   'Approximately one quarter of the human bones are in the feet',
+  //   'A slug\'s blood is green',
+  // ];
+  //
+  // List<bool> answers = [false, true, true];
+
+  //List of questions before writing it in quizBrain.dart file
+
+  // List<Question> questionAns = [
+  //   Question(q: 'You can lead a cow downstairs, but not upstairs', a: false),
+  //   Question(
+  //       q: 'Approximately one quarter of the human bones are in the feet',
+  //       a: true),
+  //   Question(q: 'A slug\'s blood is green', a: true)
+  // ];
+
+  void checkAnswer(bool userPickedAnswer) {
+    bool correctAns = quizBrain.getQuestionAnswer();
+
+    if (quizBrain.isFinished()) {
+      Alert(
+          context: context,
+          title: 'Finished',
+          desc: 'You have reached the end of the flutter application');
+      quizBrain.reset();
+      scoreKeeper.clear();
+    } else {
+      if (correctAns == userPickedAnswer) {
+        scoreKeeper.add(Icon(
+          Icons.check,
+          color: Colors.green,
+        ));
+      } else {
+        scoreKeeper.add(
+          Icon(
+            Icons.close,
+            color: Colors.red,
+          ),
+        );
+      }
+      setState(() {
+        quizBrain.nextQuestion();
+      });
+    }
+  }
+
+  List<Icon> scoreKeeper = [];
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +93,8 @@ class _QuizBoxState extends State<QuizBox> {
             padding: const EdgeInsets.all(15.0),
             child: Center(
               child: Text(
-                'This is where the question text will go',
+                // quizBrain.questionAns[qtrack].questionText,
+                quizBrain.getQuestionText(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
@@ -76,14 +120,9 @@ class _QuizBoxState extends State<QuizBox> {
                 backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
               ),
               onPressed: () {
-                setState(() {
-                  scoreKeeper.add(
-                    Icon(
-                      Icons.check,
-                      color: Colors.green,
-                    ),
-                  );
-                });
+                // print(quizBrain.questionAns[0].questionText);
+                // bool correctAns = quizBrain.questionAns[qtrack].questionAnswer;
+                checkAnswer(true);
               },
             ),
           ),
@@ -103,7 +142,10 @@ class _QuizBoxState extends State<QuizBox> {
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
               ),
-              onPressed: () {},
+              onPressed: () {
+                // bool correctAns = quizBrain.questionAns[qtrack].questionAnswer;
+                checkAnswer(false);
+              },
             ),
           ),
         ),
